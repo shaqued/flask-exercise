@@ -93,6 +93,7 @@ def put(id):
 
     if(updated_user is None):
         return create_response(status=404, message="user to update cannot be found")
+
     return create_response(updated_user)
 
 @app.route('/users/<id>', methods=['DELETE'])
@@ -101,7 +102,9 @@ def delete(id):
 
     if(user is None):
         return create_response(status=404, message="user to delete cannot be found")
+
     db.deleteById('users', int(id))
+
     return create_response(status=200, message="deleted user successfully")
 
 """
