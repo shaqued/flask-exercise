@@ -53,57 +53,55 @@ def mirror(name):
 
 
 @app.route("/users")
-def get_users():
-    data = db.get('users')
+def get_users() -> Tuple[Response, int]:
+    users = db.get('users')
+    filterByField = lambda user, field: str(user[field]) == request.args[field]
+    fields = ["team", "age"]
 
-    if "team" in request.args:
-        data = list(filter(lambda x: x["team"] == request.args["team"], data))
+    for field in fields:
+        if field in request.args:
+            users = list(filter(lambda user: filterByField(user, field), users))
 
-    return create_response({"users": data})
+    return create_response({"users": users})
 
 
-@app.route("/users/<id>")
-def get_user(id):
-    data = db.getById('users', int(id))
+@app.route("/users/<int:id>")
+def get_user(id : int) -> Tuple[Response, int]:
+    user = db.getById('users', id)
 
-    if data is None:
+    if user is None:
         return create_response(status=404, message="user cannot be found")
 
-    return create_response(data)
+    return create_response(user)
 
 
 @app.route('/users', methods=['POST'])
-def post():
-    # TODO: check existing params
-    def verify_params():
-        pass
-
+def post() -> Tuple[Response, int]:
     data = request.json
-    verify_params()
     new_user = db.create('users', data)
 
     return create_response(new_user)
 
-@app.route('/users/<id>', methods=['PUT'])
-def put(id):
+@app.route('/users/<int:id>', methods=['PUT'])
+def put(id: int) -> Tuple[Response, int]:
     data = request.json
     keys = ['name', 'age', 'team']
     props = dict((k, data[k]) for k in keys if k in data)
-    updated_user = db.updateById('users', int(id), props)
+    updated_user = db.updateById('users', id, props)
 
-    if(updated_user is None):
+    if updated_user is None:
         return create_response(status=404, message="user to update cannot be found")
 
     return create_response(updated_user)
 
-@app.route('/users/<id>', methods=['DELETE'])
-def delete(id):
-    user = db.getById('users', int(id))
+@app.route('/users/<int:id>', methods=['DELETE'])
+def delete(id: int) -> Tuple[Response, int]:
+    user = db.getById('users', id)
 
-    if(user is None):
+    if user is None:
         return create_response(status=404, message="user to delete cannot be found")
 
-    db.deleteById('users', int(id))
+    db.deleteById('users', id)
 
     return create_response(status=200, message="deleted user successfully")
 
