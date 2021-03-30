@@ -72,7 +72,7 @@ def get_user(id : int) -> Tuple[Response, int]:
     if user is None:
         return create_response(status=404, message="user cannot be found")
 
-    return create_response(user)
+    return create_response({"user": user})
 
 
 @app.route('/users', methods=['POST'])

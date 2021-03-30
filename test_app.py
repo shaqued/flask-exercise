@@ -2,6 +2,8 @@
 # pytest automatically injects fixtures
 # that are defined in conftest.py
 # in this case, client is injected
+import json
+
 def test_index(client):
     res = client.get("/")
     assert res.status_code == 200
@@ -39,3 +41,16 @@ def test_get_user_id(client):
     res_user = res.json["result"]["user"]
     assert res_user["name"] == "Aria"
     assert res_user["age"] == 19
+
+def test_post_user(client):
+    res = client.post("/users", data=json.dumps({"name":"shaqued", "age": 24, "team":"good"}), headers={'Content-Type': 'application/json'})
+    assert res.status_code == 200
+
+    res_user = res.json["result"]
+    assert res_user["name"] == "shaqued"
+    assert res_user["age"] == 24
+    assert res_user["team"] == "good"
+
+def test_delete_user(client):
+    res = client.delete("/users/1")
+    assert res.status_code == 200
